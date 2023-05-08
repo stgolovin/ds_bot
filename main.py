@@ -8,8 +8,8 @@ bot = telebot.TeleBot(config.TOKEN)
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
-    global price
-    price = 0
+    # global price
+    # price = 0
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     item1 = types.KeyboardButton("Рассчитать подъемник")
     item2 = types.KeyboardButton("Перейти на наш сайт")
@@ -23,6 +23,8 @@ def welcome(message):
 
 @bot.message_handler()
 def answer(message):
+    global price
+    price = 0
     if message.chat.type == 'private':
         if message.text == 'Рассчитать подъемник':
             markup = types.InlineKeyboardMarkup(row_width=2)
@@ -57,7 +59,11 @@ def callback_inline(call):
                                   message_id=call.message.message_id,
                                   text='Вы выбрали горизонтальный подъемник.',
                                   reply_markup=None)
-            bot.send_message(call.message.chat.id, 'Пока сюжет не написан. Лучше попробуйте вертикальный.')
+            markup = types.InlineKeyboardMarkup(row_width=2)
+            item1 = types.InlineKeyboardButton('До 4 метра', callback_data='4m')
+            item2 = types.InlineKeyboardButton('До 6 метров', callback_data='6m')
+            markup.add(item1, item2)
+            bot.send_message(call.message.chat.id, "Выберите длину пути", reply_markup=markup)
 
         if call.data == '1m':
             price += 175000
@@ -82,6 +88,30 @@ def callback_inline(call):
             item2 = types.InlineKeyboardButton('Не нужна', callback_data='withoutdisp')
             markup.add(item1, item2)
             bot.send_message(call.message.chat.id, "Что насчет диспетчеризации?", reply_markup=markup)
+
+        if call.data == '4m':
+            price += 390000
+            bot.edit_message_text(chat_id=call.message.chat.id,
+                                  message_id=call.message.message_id,
+                                  text="Вы выбрали длину пути до 4 метра",
+                                  reply_markup=None)
+            markup = types.InlineKeyboardMarkup(row_width=2)
+            item1 = types.InlineKeyboardButton('Нужна', callback_data='withdisp')
+            item2 = types.InlineKeyboardButton('Не нужна', callback_data='withoutdisp')
+            markup.add(item1, item2)
+            bot.send_message(call.message.chat.id, "Что насчет диспетчиризации?", reply_markup=markup)
+
+        elif call.data == '6m':
+            price += 450000
+            bot.edit_message_text(chat_id=call.message.chat.id,
+                                  message_id=call.message.message_id,
+                                  text="Вы выбрали длину пути до 6 метра",
+                                  reply_markup=None)
+            markup = types.InlineKeyboardMarkup(row_width=2)
+            item1 = types.InlineKeyboardButton('Нужна', callback_data='withdisp')
+            item2 = types.InlineKeyboardButton('Не нужна', callback_data='withoutdisp')
+            markup.add(item1, item2)
+            bot.send_message(call.message.chat.id, "Что насчет диспетчиризации?", reply_markup=markup)
 
         if call.data == 'withdisp':
             price += 30000
